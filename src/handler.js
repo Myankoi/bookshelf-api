@@ -8,9 +8,6 @@ const addBookHandler = (request, h) => {
   const finished = pageCount === readPage
   const insertedAt = new Date().toISOString()
   const updatedAt = insertedAt
-  const newBook = {
-    id, name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt
-  }
 
   const failNoNameBook = books.find((book) => book.name !== name)
   if (failNoNameBook) {
@@ -30,6 +27,10 @@ const addBookHandler = (request, h) => {
     })
     response.code(400)
     return response
+  }
+
+  const newBook = {
+    id, name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt
   }
 
   books.push(newBook)
@@ -52,18 +53,16 @@ const addBookHandler = (request, h) => {
 const getAllBooksHandler = (request, h) => {
   const { reading, name, finished } = request.query
 
-  let filteredBooks = books
-  if (name !== undefined) {
-    filteredBooks = books.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()))
-  } else if (reading !== undefined) {
-    const isReading = reading === '1'
-    filteredBooks = books.filter((book) => book.reading === isReading)
+  let filteredBooks = [...books]
+  if (reading !== undefined) {
+    filteredBooks = books.filter((book) => book.reading === '1')
   } else if (finished !== undefined) {
-    const isFinished = finished === '1'
-    filteredBooks = books.filter((book) => book.finished === isFinished)
+    filteredBooks = books.filter((book) => book.finished === '1')
+  } else if (name !== undefined) {
+    filteredBooks = books.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()))
   }
 
-  filteredBooks = filteredBooks.map((book) => ({
+  filteredBooks = books.map((book) => ({
     id: book.id,
     name: book.name,
     publisher: book.publisher
@@ -174,7 +173,7 @@ const deleteBookByIdHandler = (request, h) => {
     return response
   }
 
-  const failBookId = !books.find((book) => book.id === bookId)
+  const failBookId = books.filter((book) => book.id !== bookId)
   if (failBookId) {
     const response = h.response({
       status: 'fail',
