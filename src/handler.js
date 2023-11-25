@@ -53,11 +53,13 @@ const addBookHandler = (request, h) => {
 const getAllBooksHandler = (request, h) => {
   const { reading, name, finished } = request.query
 
-  let filteredBooks = [...books]
+  let filteredBooks = books
   if (reading !== undefined) {
-    filteredBooks = books.filter((book) => book.reading === '1')
+    const isReading = reading === '1'
+    filteredBooks = books.filter((book) => book.reading === isReading)
   } else if (finished !== undefined) {
-    filteredBooks = books.filter((book) => book.finished === '1')
+    const isFinished = finished === '1'
+    filteredBooks = books.filter((book) => book.finished === isFinished)
   } else if (name !== undefined) {
     filteredBooks = books.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()))
   }
